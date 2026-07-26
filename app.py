@@ -14,7 +14,7 @@ st.set_page_config(
 # --- LOAD MODEL & SCALER ---
 @st.cache_resource
 def load_model():
-    with open('wine_knn_model.pkl', 'rb') as file:
+    with open('KNN Classifier.pkl', 'rb') as file:
         data = pickle.load(file)
     
     # If saved as a dictionary (bundled model + scaler)
