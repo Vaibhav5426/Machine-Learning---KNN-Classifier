@@ -14,16 +14,18 @@ st.set_page_config(
 # --- LOAD MODEL & SCALER ---
 @st.cache_resource
 def load_model():
-    with open('KNN Classifier.pkl', 'rb') as file:
+    with open('wine_knn_model.pkl', 'rb') as file:
         data = pickle.load(file)
-    return data['model'], data['scaler']
 
-try:
-    knn, scaler = load_model()
-except FileNotFoundError:
-    st.error("Model file not found! Please make sure 'wine_knn_model.pkl' is in the same directory.")
-    st.stop()
-
+    # Check if loaded data is a dictionary containing expected keys
+    if isinstance(data, dict):
+        return data['model'], data['scaler']
+    else:
+        st.error(
+            "The pickle file contains an unbundled object instead of a model dictionary. "
+            'Please re-save using the dictionary structure.'
+        )
+        st.stop()
 # --- HEADER SECTION ---
 st.title("🍷 Red Wine Quality Predictor")
 st.markdown("""
