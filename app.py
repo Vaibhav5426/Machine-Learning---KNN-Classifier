@@ -14,22 +14,22 @@ st.set_page_config(
 # --- LOAD MODEL & SCALER ---
 @st.cache_resource
 def load_model():
-    with open('KNN Classifier.pkl', 'rb') as file:
+    with open('wine_knn_model.pkl', 'rb') as file:
         data = pickle.load(file)
     
-    # If saved as a dictionary (bundled model + scaler)
-    if isinstance(data, dict) and 'model' in data and 'scaler' in data:
-        return data['model'], data['scaler']
-    else:
-        st.error("Invalid .pkl format. Ensure 'wine_knn_model.pkl' contains a dictionary with keys 'model' and 'scaler'.")
-        st.stop()
+    if isinstance(data, dict):
+        # Extract model using any common key name
+        model = data.get('model') or data.get('knn_model') or data.get('knn')
+        scaler = data.get('scaler')
+        
+        if model is not None and scaler is not None:
+            return model, scaler
 
-# IMPORTANT: Both variables must be unpacked globally here
-try:
-    knn, scaler = load_model()
-except FileNotFoundError:
-    st.error("Model file 'wine_knn_model.pkl' not found in repository.")
+    st.error("Could not load model and scaler from 'wine_knn_model.pkl'.")
     st.stop()
+
+# Unpack globally
+knn, scaler = load_model()
 # --- HEADER SECTION ---
 st.title("🍷 Red Wine Quality Predictor")
 st.markdown("""
