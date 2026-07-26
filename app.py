@@ -14,21 +14,35 @@ st.set_page_config(
 # --- LOAD MODEL & SCALER ---
 @st.cache_resource
 def load_model():
-    with open('KNN Classifier.pkl', 'rb') as file:
-        data = pickle.load(file)
-    
+    # Set exact filename as named in your repository
+    file_name = "KNN Classifier.pkl"
+
+    try:
+        with open(file_name, "rb") as file:
+            data = pickle.load(file)
+    except FileNotFoundError:
+        st.error(
+            f"File '{file_name}' not found. Please ensure it is uploaded to your root GitHub folder."
+        )
+        st.stop()
+
+    # Case A: Saved as a dictionary containing both model and scaler
     if isinstance(data, dict):
-        # Extract model using any common key name
-        model = data.get('model') or data.get('knn_model') or data.get('knn')
-        scaler = data.get('scaler')
-        
+        model = data.get("model") or data.get("knn_model") or data.get("knn")
+        scaler = data.get("scaler")
+
         if model is not None and scaler is not None:
             return model, scaler
 
-    st.error("Could not load model and scaler from 'wine_knn_model.pkl'.")
+    # Case B: File only contains the trained model, missing the scaler
+    st.error(
+        f"'{file_name}' was found, but it only contains the model object without the `StandardScaler`."
+    )
+    st.info(
+        "Please re-save 'KNN Classifier.pkl' as a dictionary containing both `model` and `scaler`."
+    )
     st.stop()
-
-# Unpack globally
+# Load model and scaler globally
 knn, scaler = load_model()
 # --- HEADER SECTION ---
 st.title("🍷 Red Wine Quality Predictor")
