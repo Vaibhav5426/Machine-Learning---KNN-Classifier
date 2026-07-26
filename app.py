@@ -16,16 +16,20 @@ st.set_page_config(
 def load_model():
     with open('wine_knn_model.pkl', 'rb') as file:
         data = pickle.load(file)
-
-    # Check if loaded data is a dictionary containing expected keys
-    if isinstance(data, dict):
+    
+    # If saved as a dictionary (bundled model + scaler)
+    if isinstance(data, dict) and 'model' in data and 'scaler' in data:
         return data['model'], data['scaler']
     else:
-        st.error(
-            "The pickle file contains an unbundled object instead of a model dictionary. "
-            'Please re-save using the dictionary structure.'
-        )
+        st.error("Invalid .pkl format. Ensure 'wine_knn_model.pkl' contains a dictionary with keys 'model' and 'scaler'.")
         st.stop()
+
+# IMPORTANT: Both variables must be unpacked globally here
+try:
+    knn, scaler = load_model()
+except FileNotFoundError:
+    st.error("Model file 'wine_knn_model.pkl' not found in repository.")
+    st.stop()
 # --- HEADER SECTION ---
 st.title("🍷 Red Wine Quality Predictor")
 st.markdown("""
